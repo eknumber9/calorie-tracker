@@ -161,7 +161,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.23.0/umd/index.min.js"></script>
 <script>
 // The app code is split into small files; join them and run.
-Promise.all(["a1.js", "a2.js", "a3.js", "a4.js", "a5.js"].map(f=>fetch(f,{cache:'no-cache'}).then(r=>{if(!r.ok)throw 0;return r.text()})))
+Promise.all(["common.js", "a1.js", "a2.js", "a3.js", "a4.js", "a5.js", "a6.js"].map(f=>fetch(f,{cache:'no-cache'}).then(r=>{if(!r.ok)throw 0;return r.text()})))
 .then(t=>{const s=document.createElement('script');s.textContent=t.join('');document.body.appendChild(s)})
 .catch(()=>{document.body.insertAdjacentHTML('afterbegin','<p style="padding:20px">Couldn\'t load the app. Check your connection and reopen.</p>')});
 </script>
