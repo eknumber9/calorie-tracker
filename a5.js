@@ -78,4 +78,3 @@ try{S.key=localStorage.getItem(P+'apikey')||''}catch(e){}
 setMeal(S.meal);render();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
-})();
