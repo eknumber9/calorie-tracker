@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Calories">
+<meta name="theme-color" content="#0f1013">
+<link rel="manifest" href="manifest.json">
+<title>Calories</title>
+<link rel="stylesheet" href="s1.css">
+<link rel="stylesheet" href="s2.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <button class="navbtn" id="prev" aria-label="Previous day">‹</button>
+    <div class="datebox">
+      <div class="d" id="dateLabel">Today</div>
+      <div class="sync"><span>Saved on this phone</span></div>
+    </div>
+    <button class="navbtn" id="next" aria-label="Next day">›</button>
+  </header>
+
+  <section class="card">
+    <div class="summary">
+      <div class="ring">
+        <svg width="132" height="132" viewBox="0 0 132 132">
+          <circle cx="66" cy="66" r="56" fill="none" stroke="var(--card2)" stroke-width="12"/>
+          <circle id="ringArc" cx="66" cy="66" r="56" fill="none" stroke="var(--accent)" stroke-width="12" stroke-linecap="round" stroke-dasharray="351.86" stroke-dashoffset="351.86" style="transition:stroke-dashoffset .4s"/>
+        </svg>
+        <div class="mid"><div><div class="big" id="remain">0</div><div class="lbl" id="remainLbl">left</div></div></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><span>Goal</span><b id="sGoal">0</b></div>
+        <div class="stat"><span>Eaten</span><b id="sEaten">0</b></div>
+        <div class="stat"><span>Protein to go</span><b id="sProt">0</b></div>
+      </div>
+    </div>
+    <div class="macros" id="macros"></div>
+  </section>
+
+  <div id="meals"></div>
+
+  <section class="card week">
+    <h3>Last 7 days</h3>
+    <div class="sub" id="weekSub"></div>
+    <div class="bars" id="bars"></div>
+  </section>
+
+  <section class="card week">
+    <h3>Bodyweight</h3>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <input id="wIn" inputmode="decimal" placeholder="Morning weight (lb)">
+      <button class="btn" id="wBtn" style="width:auto;margin:0;padding:0 18px">Log</button>
+    </div>
+    <div class="sub" id="wSub" style="margin:10px 0 0"></div>
+  </section>
+</div>
+
+<button class="gear" id="gear" aria-label="Settings">⚙︎</button>
+<button class="fab" id="fab" aria-label="Add food">+</button>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- Add / edit sheet -->
+<div class="sheet" id="addSheet" role="dialog" aria-label="Add food">
+  <div class="grab"></div>
+  <div class="shead"><h2 id="addTitle">Add food</h2><button class="x" data-close>✕</button></div>
+  <div class="seg" id="mealSeg"></div>
+  <div class="tabs" id="tabsWrap"><div class="seg" id="tabs">
+    <button data-tab="photo">Scan</button>
+    <button data-tab="est" id="tabEst">Describe</button>
+    <button data-tab="man">Manual</button>
+    <button data-tab="lib">My foods</button>
+  </div></div>
+
+  <div class="pane" id="pane-photo">
+    <button class="shoot" id="scanBtn" style="width:100%;text-align:left">
+      <span class="ic">▥</span>
+      <span><b id="shootTitle">Scan a barcode</b><br><small id="shootSub">Point your camera at the barcode</small></span>
+    </button>
+    <label class="shoot" id="shootLbl" style="margin-top:10px">
+      <input type="file" id="photoIn" accept="image/*" capture="environment" hidden>
+      <span class="ic">📷</span>
+      <span><b>Photo of label or plate</b><br><small id="photoSub">Claude reads the Nutrition Facts or estimates your meal</small></span>
+    </label>
+    <input id="photoNote" placeholder="Note for photos (optional), e.g. &quot;ate about half&quot;" autocomplete="off" style="margin-top:10px">
+    <div id="photoStatus" class="hint"></div>
+  </div>
+
+  <div class="pane" id="pane-est">
+    <textarea id="estText" rows="3" placeholder="e.g. 2 scrambled eggs, 2 slices sourdough with butter, black coffee"></textarea>
+    <button class="btn" id="estBtn">Estimate calories</button>
+  </div>
+
+  <div id="estOut"></div>
+
+  <div class="pane" id="pane-man">
+    <div id="manCode" class="hint" style="margin:0 0 4px"></div>
+    <label class="f">Food</label>
+    <input id="mName" placeholder="Chicken burrito bowl" autocomplete="off">
+    <div class="row2">
+      <div><label class="f">Calories (per serving)</label><input id="mCal" inputmode="decimal" placeholder="0"></div>
+      <div><label class="f">Servings</label><input id="mSrv" inputmode="decimal" value="1"></div>
+    </div>
+    <div class="grid4">
+      <div><label class="f">Protein g</label><input id="mP" inputmode="decimal" placeholder="0"></div>
+      <div><label class="f">Carbs g</label><input id="mC" inputmode="decimal" placeholder="0"></div>
+      <div><label class="f">Fat g</label><input id="mF" inputmode="decimal" placeholder="0"></div>
+    </div>
+    <button class="btn" id="manBtn">Add</button>
+    <button class="btn danger" id="delBtn" style="display:none">Delete entry</button>
+  </div>
+
+  <div class="pane" id="pane-lib">
+    <input id="libQ" placeholder="Search your foods" autocomplete="off">
+    <div id="libList"></div>
+    <p class="hint">Everything you log is saved here. Tap to add one serving.</p>
+  </div>
+</div>
+
+<!-- Settings sheet -->
+<div class="sheet" id="setSheet" role="dialog" aria-label="Settings">
+  <div class="grab"></div>
+  <div class="shead"><h2>Settings</h2><button class="x" data-close>✕</button></div>
+  <label class="f">Calories</label><input id="gCal" inputmode="numeric">
+  <div class="grid4">
+    <div><label class="f">Protein g</label><input id="gP" inputmode="numeric"></div>
+    <div><label class="f">Carbs g</label><input id="gC" inputmode="numeric"></div>
+    <div><label class="f">Fat g</label><input id="gF" inputmode="numeric"></div>
+  </div>
+  <label class="f">Goal weight (lb)</label><input id="gW" inputmode="decimal">
+  <p class="hint">Recommended: 2,700 cal · 190 g protein · 315 g carbs · 75 g fat. That's a slow cut toward 190 lb. If your 7-day average weight isn't dropping about 0.5–0.75 lb a week after 2–3 weeks, lower calories by 150–200.</p>
+  <button class="btn ghost" id="useRec">Use recommended</button>
+
+  <label class="f" style="margin-top:18px">Anthropic API key (optional)</label>
+  <input id="gKey" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sk-ant-…">
+  <p class="hint">Turns on Describe and label/plate photos. Stored only on this phone and sent only to Anthropic. Barcode scanning works without it.</p>
+
+  <button class="btn" id="saveGoals">Save</button>
+
+  <label class="f" style="margin-top:18px">Your data</label>
+  <button class="btn ghost" id="backupBtn" style="margin-top:4px">Back up (save a file)</button>
+  <label class="btn ghost" style="text-align:center">Restore from backup<input type="file" id="restoreIn" accept="application/json,.json" hidden></label>
+  <button class="btn ghost" id="exportBtn">Export log as CSV</button>
+  <p class="hint">Data lives only on this phone, so back up now and then.</p>
+</div>
+
+<!-- Live scanner -->
+<div class="scanner" id="scanner">
+  <video id="vid" playsinline muted autoplay></video>
+  <div class="frame"></div>
+  <div class="scanbar"><span id="scanMsg">Line up the barcode in the box</span><button id="scanClose">Cancel</button></div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span><button id="toastBtn">Undo</button></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.23.0/umd/index.min.js"></script>
+<script>
+// The app code is split into small files; join them and run.
+Promise.all(["a1.js", "a2.js", "a3.js", "a4.js", "a5.js"].map(f=>fetch(f,{cache:'no-cache'}).then(r=>{if(!r.ok)throw 0;return r.text()})))
+.then(t=>{const s=document.createElement('script');s.textContent=t.join('');document.body.appendChild(s)})
+.catch(()=>{document.body.insertAdjacentHTML('afterbegin','<p style="padding:20px">Couldn\'t load the app. Check your connection and reopen.</p>')});
+</script>
+</body>
+</html>
