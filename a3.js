@@ -42,17 +42,21 @@ function decodeBarcode(canvas){
 }
 
 /* ---------- live scanner ---------- */
-let stream=null,scanTimer=null;const scanCanvas=document.createElement('canvas');
+// iOS forgets camera permission for home-screen apps, so keep one stream warm per session.
+let stream=null,scanTimer=null,idleTimer=null,scanning=false;const scanCanvas=document.createElement('canvas');
+function camLive(){return stream&&stream.getVideoTracks().some(t=>t.readyState==='live')}
 async function openScanner(){
-  $('scanner').classList.add('show');$('scanMsg').textContent='Line up the barcode in the box';
+  $('scanner').classList.add('show');$('scanMsg').textContent='Line up the barcode in the box';clearTimeout(idleTimer);
   try{
-    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}},audio:false});
-    const v=$('vid');v.srcObject=stream;await v.play();scanLoop();
-  }catch(e){$('scanMsg').textContent='Camera blocked. Allow camera access for this app in iPhone Settings, then try again.'}
+    if(!camLive())stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}},audio:false});
+    const v=$('vid');if(v.srcObject!==stream)v.srcObject=stream;await v.play();scanning=true;scanLoop();
+  }catch(e){$('scanMsg').textContent='Camera blocked. Allow camera access, or use "Photo of barcode" below instead.'}
 }
-function stopScanner(){clearTimeout(scanTimer);if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;$('vid').srcObject=null;$('scanner').classList.remove('show')}
+function killCam(){clearTimeout(idleTimer);if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;$('vid').srcObject=null}
+function stopScanner(){clearTimeout(scanTimer);scanning=false;try{$('vid').pause()}catch(e){}$('scanner').classList.remove('show');clearTimeout(idleTimer);idleTimer=setTimeout(killCam,180000)}
+document.addEventListener('visibilitychange',()=>{if(document.hidden){stopScanner();killCam()}});
 function scanLoop(){
-  if(!stream)return;const v=$('vid');
+  if(!scanning||!stream)return;const v=$('vid');
   if(v.videoWidth){
     const w=v.videoWidth,h=v.videoHeight,cw=Math.round(w*0.85),ch=Math.round(Math.min(h*0.4,cw*0.7)),k=Math.min(1,900/cw);
     scanCanvas.width=Math.round(cw*k);scanCanvas.height=Math.round(ch*k);
