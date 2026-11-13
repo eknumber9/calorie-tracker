@@ -1,4 +1,5 @@
-  $('photoSub').textContent=S.pendingCode?`Snap the Nutrition Facts label to save barcode ${S.pendingCode}`:'Claude reads the Nutrition Facts or estimates your meal';
+  $('photoSub').parentNode.querySelector('b').textContent=S.key?'Photo of label or plate':'Photo of barcode';
+  $('photoSub').textContent=S.pendingCode?`Snap the Nutrition Facts label to save barcode ${S.pendingCode}`:(S.key?'Barcode, Nutrition Facts or your plate':'Opens the camera app, no permission pop-up');
 }
 function pstatus(h){$('photoStatus').innerHTML=h||''}
 function loadImg(file){return new Promise((res,rej)=>{const url=URL.createObjectURL(file),img=new Image();img.onload=()=>res({img,url});img.onerror=()=>{URL.revokeObjectURL(url);rej({message:"Couldn't open that photo."})};img.src=url})}
@@ -11,6 +12,7 @@ $('photoIn').onchange=async e=>{
     const r0=await loadImg(file);url=r0.url;const img=r0.img;
     let code=decodeBarcode(toCanvas(img,1600))||decodeBarcode(toCanvas(img,900));
     if(code&&!S.pendingCode){const hit=findLib(code);if(hit)return showFound(hit,code)}
+    if(!S.key){if(code){pstatus('');await onCode(code)}else pstatus("Couldn't read a barcode. Fill the frame with the bars and hold steady.");return}
     const blob=await new Promise(r=>toCanvas(img,1400).toBlob(r,'image/jpeg',0.85));
     const note=$('photoNote').value.trim();
     const r=await askClaude(`Look at this photo for a calorie tracking app. It shows one of: (a) a Nutrition Facts label, (b) a product package or barcode with no nutrition label visible, or (c) food on a plate / a meal.
