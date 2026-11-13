@@ -26,7 +26,7 @@ $('tabs').onclick=e=>{const b=e.target.closest('[data-tab]');if(b)setTab(b.datas
 function openAdd(meal){
   S.editing=null;setMeal(meal||defaultMeal());$('addTitle').textContent='Add food';$('tabsWrap').style.display='';
   ['mName','mCal','mP','mC','mF'].forEach(i=>$(i).value='');$('mSrv').value='1';$('manBtn').textContent='Add';$('delBtn').style.display='none';
-  const hasKey=!!S.key;$('tabEst').style.display=hasKey?'':'none';$('shootLbl').style.display=hasKey?'':'none';
+  const hasKey=!!S.key;$('tabEst').style.display=hasKey?'':'none';$('shootLbl').style.display='';
   setShoot();setTab('photo');open('addSheet');
 }
 function openEdit(id){
